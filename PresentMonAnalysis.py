@@ -16,19 +16,19 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel):
         # Create plot (hard coded settings for now)
         p = figure(title=histTitle, x_axis_label=xLabel,
                    y_axis_label=yLabel)
-        p.x_range.end = 100
-        p.x_range.start = 0
+        p.x_range.end = mu - 4*sigma
+        p.x_range.start = mu + 4*sigma
         p.width = width
         p.toolbar.logo = None
-        hist, edges = np.histogram(data, density=True, bins=len(data))
+        hist, edges = np.histogram(data, density=True, bins=min(2000, len(data)))
         p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
                fill_color="#34d5eb", line_color="#34d5eb")
 
         # Add markers for mean, stdev
         muLine = Span(location=mu, dimension='height', line_color='red', line_width=1)
-        sigmaLinePos = Span(location=(mu + sigma), dimension='height', line_color='green', line_width=1)
-        sigmaLineNeg = Span(location=(mu - sigma), dimension='height', line_color='green', line_width=1)
-        p.renderers.extend([muLine, sigmaLinePos, sigmaLineNeg])
+        #sigmaLinePos = Span(location=(mu + sigma), dimension='height', line_color='green', line_width=1)
+        #sigmaLineNeg = Span(location=(mu - sigma), dimension='height', line_color='green', line_width=1)
+        p.renderers.extend([muLine])
 
         # Create descriptive label:
         dataDescription = "Mean: " + "{:10.3f}".format(mu) + ",   StdDev: " + "{:10.3f}".format(sigma)
@@ -72,7 +72,7 @@ def CreateLineDiagram(data, width):
 
 # SETTINGS
 # Hard coded source for now
-data = LoadFromCsv("TestData/r5apex-0.csv")
+data = LoadFromCsv("TestData/csgo.csv")
 
 # Set output file
 output_file("Analysis.html")
