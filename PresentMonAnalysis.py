@@ -1,6 +1,7 @@
 from bokeh.plotting import figure, output_file, show
 from bokeh.models import Span, Label, Tabs, Panel
-from bokeh.layouts import column
+from bokeh.models.widgets import Div
+from bokeh.layouts import column, widgetbox
 import numpy as np
 from PresentMonResult import PresentMonResult, LoadFromCsv
 
@@ -70,9 +71,28 @@ def CreateLineDiagram(data, width):
 
         return p
 
+def GenerateTextStatistics(data, width):
+        # Calulate average frame-to-frame difference magnitude
+        diffs = []
+        frameIterator = iter(data.msBetweenPresents)
+        prev = next(frameIterator)      # Get first frame time
+        for frame in frameIterator:
+                diffs.append(abs(frame - prev))
+                prev = frame
+        max = np.max(diffs)
+        min = np.min(diffs)
+        avg = np.mean(diffs)
+
+        # Generate graphic
+        text =  "<p>Frame-to-frame average magnitude of difference: " + "{:10.3f}".format(avg) + \
+                "</p> <p>Frame-to-frame maximum magnitude of difference: " + "{:10.3f}".format(max) + \
+                "</p>" + "<p>Frame-to-frame minimum magnitude of difference: " + "{:10.3f}".format(min) + "<br/> </p>"
+        div = Div(text=text, width=width)
+        return div
+
 # SETTINGS
 # Hard coded source for now
-data = LoadFromCsv("TestData/csgo.csv")
+data = LoadFromCsv("TestData/csgo-2.csv")
 
 # Set output file
 output_file("Analysis.html")
@@ -80,6 +100,6 @@ output_file("Analysis.html")
 # Generate plots
 histogram = CreateTabbedHistogram(data, 1068)
 lineDiagram = CreateLineDiagram(data, 1068)
-
+div = GenerateTextStatistics(data, 1068)
 # Output and show
-show(column(histogram, lineDiagram))
+show(column(div, histogram, lineDiagram))

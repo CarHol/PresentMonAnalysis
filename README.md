@@ -11,6 +11,8 @@ This tool uses Bokeh to generate interactive charts in HTML and JS.
 
 ## What works
 - Histogram view with fixed values (result file path is hard coded, currently to an included example file) representing the relative frequency of FPS values.
+- Frametimes plotted against time
+- Text box with frame-to-frame statistics (maximum, minimum and average difference in rendering time between two successive frames)
 
 ## In progress
 - Argument parsing for file input
