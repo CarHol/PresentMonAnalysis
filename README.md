@@ -14,14 +14,19 @@ This tool uses Bokeh to generate interactive charts in HTML and JS.
 
 ## What works
 - Histogram view with fixed values (result file path is hard coded, currently to an included example file) representing the relative frequency of FPS values.
+- Tabbed switching between frame times and framerate for histogram
 - Frametimes plotted against time
-- Text box with frame-to-frame statistics (maximum, minimum and average difference in rendering time between two successive frames)
+- Text box with basic frame-to-frame statistics (maximum, minimum and average difference in rendering time between two successive frames)
 
 ## In progress
 - Argument parsing for file input
-- Multi-chart view to include a frame time scatter plot
 - Multi-file support (appending time stamps)
-- In-chart switching between frame times (ms) and frequency (fps)
+- In-chart switching between frame times (ms) and frequency (fps) for all relevant charts
+- Switching between frame data (for instance, between msBetweenPresents and msUntilDisplayed)
+- More advanced statistics
+    - Analysis by percentile
+    - Stutter analysis
+        - Average/max/min time before framerate drops under certain thresholds (60/120/144 Hz etc)
 
 ## Dependencies
 - Python 3.7
