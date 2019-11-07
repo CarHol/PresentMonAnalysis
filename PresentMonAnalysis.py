@@ -65,19 +65,31 @@ def CreateTabbedHistogram(dataSet, width):
         return Tabs(tabs=[timeTab, frequencyTab])
 
 
-def CreateLineDiagram(data, width):
-        p = figure(title="Framtimes", x_axis_label='T (ms)', y_axis_label='Frame')
+
+
+def CreateLineDiagram(frameData, timeData, width, chartTitle, xLabel, yLabel):
+        p = figure(title=chartTitle, x_axis_label=xLabel, y_axis_label=yLabel)
         p.width = width
         p.toolbar.logo = None
 
-        # Assign data
-        x = data.timeStamps
-        y = data.msBetweenPresents
-
         # Add line
-        p.line(data.timeStamps, data.msBetweenPresents, line_width=0.5)
+        p.line(timeData, frameData, line_width=0.5)
 
         return p
+
+
+def CreateTabbedLineDiagram(dataSet, width):
+    # Create charts
+    frequencyData = 1000. / dataSet.msBetweenPresents
+
+    timeChart = CreateLineDiagram(dataSet.msBetweenPresents, dataSet.timeStamps, width, "Framtimes", "Runtime (s)", "Frame time (ms)")
+    frequencyChart = CreateLineDiagram(frequencyData, dataSet.timeStamps,  width, "Framerate", "Runtime (s)", "Framerate (fps)")
+
+    # Create panels
+    timeTab = Panel(child=timeChart, title="Frametimes")
+    frequencyTab = Panel(child=frequencyChart, title="Framerate")
+
+    return Tabs(tabs=[timeTab, frequencyTab])
 
 def GenerateTextStatistics(data, width):
         # Calulate average frame-to-frame difference magnitude
@@ -127,7 +139,8 @@ output_file("Analysis.html")
 
 # Generate plots
 histogram = CreateTabbedHistogram(data, 1068)
-lineDiagram = CreateLineDiagram(data, 1068)
+lineDiagram = CreateTabbedLineDiagram(data, 1068)
+#lineDiagram = CreateLineDiagram(data, 1068)
 div = GenerateTextStatistics(data, 1068)
 
 endTime = time.time()
