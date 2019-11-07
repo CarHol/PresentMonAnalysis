@@ -18,8 +18,8 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel):
         # Create plot (hard coded settings for now)
         p = figure(title=histTitle, x_axis_label=xLabel,
                    y_axis_label=yLabel)
-        p.x_range.end = mu - 4*sigma
-        p.x_range.start = mu + 4*sigma
+        p.x_range.end = mu + 4*sigma
+        p.x_range.start = mu - 4*sigma
         p.width = width
         p.toolbar.logo = None
         hist, edges = np.histogram(data, density=True, bins=min(2000, len(data)))

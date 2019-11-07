@@ -6,6 +6,9 @@ The goal is to enable visual and mathematical analysis of benchmark data generat
 
 PresentMon outputs data in CSV format, either to file or standard output (STDOUT). PresentMonAnalysis is intended to easier gain insights from the generated data using relatively simple tools.
 
+![Example of a framerate distribution](./Screenshots/PresentMonAnalysisDist.png)
+_Example output of a framerate distribution, representing the proportion of frames corresponding to a framerate in any interval._
+
 ## Output format
 This tool uses Bokeh to generate interactive charts in HTML and JS.
 
