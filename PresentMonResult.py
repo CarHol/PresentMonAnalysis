@@ -1,5 +1,6 @@
 # IMPORTS:
 import constants
+import numpy as np
 
 # CLASSES:
 # Simple structure to hold result data

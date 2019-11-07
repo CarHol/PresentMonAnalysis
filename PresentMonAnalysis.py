@@ -3,6 +3,7 @@ from bokeh.models import Span, Label, Tabs, Panel
 from bokeh.models.widgets import Div
 from bokeh.layouts import column, widgetbox
 import numpy as np
+import time
 from PresentMonResult import PresentMonResult, LoadFromCsv
 
 # FUNCTIONS
@@ -42,9 +43,10 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel):
 
 def CreateTabbedHistogram(dataSet, width):
         # Create the charts
-        frequencyData = []
-        for frame in dataSet.msBetweenPresents:
-                frequencyData.append(1000 / frame)
+        #frequencyData = []
+        frequencyData = 1000. / np.array(dataSet.msBetweenPresents)
+        #for frame in dataSet.msBetweenPresents:
+                #frequencyData.append(1000 / frame)
 
         timeHistogram = CreateHistogram(dataSet.msBetweenPresents, width, histTitle="Frametimes", xLabel="Frame time (ms)", yLabel="Relative frequency")
         frequencyHistogram = CreateHistogram(frequencyData, width, histTitle="Framerate", xLabel="Framerate (fps)", yLabel="Relative frequency")
@@ -92,7 +94,9 @@ def GenerateTextStatistics(data, width):
 
 # SETTINGS
 # Hard coded source for now
-data = LoadFromCsv("TestData/csgo-2.csv")
+
+startTime = time.time()
+data = LoadFromCsv("TestData/r5apex-0.csv")
 
 # Set output file
 output_file("Analysis.html")
@@ -101,5 +105,8 @@ output_file("Analysis.html")
 histogram = CreateTabbedHistogram(data, 1068)
 lineDiagram = CreateLineDiagram(data, 1068)
 div = GenerateTextStatistics(data, 1068)
+
+endTime = time.time()
+print ("Time: " + str(endTime - startTime))
 # Output and show
 show(column(div, histogram, lineDiagram))
