@@ -1,7 +1,7 @@
 from bokeh.plotting import figure, output_file, show
 from bokeh.models import Span, Label, Tabs, Panel
 from bokeh.models.widgets import Div
-from bokeh.layouts import column, widgetbox
+from bokeh.layouts import column, row, widgetbox
 import numpy as np
 import time
 from PresentMonResult import PresentMonResult, LoadFromCsv
@@ -87,15 +87,32 @@ def GenerateTextStatistics(data, width):
         for frame in frameIterator:
                 diffs.append(abs(frame - prev))
                 prev = frame
-        max = np.max(diffs)
-        min = np.min(diffs)
-        avg = np.mean(diffs)
+        maxDiffAmp = np.max(diffs)
+        minDiffAmp = np.min(diffs)
+        avgDiffAmp = np.mean(diffs)
+
+        # Mean, meadian and standard deviation times
+        meanFrametime = np.mean(data.msBetweenPresents)
+        medianFrameTime = np.median(data.msBetweenPresents)
+        stdDevFrameTime = np.std(data.msBetweenPresents)
+
+        # Corresponding framerates:
+        meanFramerate = 1000. / meanFrametime
+        medianFramerate = 1000. / medianFrameTime
+        stdDevFramerate = 1000. / stdDevFrameTime
 
         # Generate graphic
-        text =  "<p>Number of processed frames: " + str(data.timeStamps.size) + \
-                "<p>Frame-to-frame average magnitude of difference: " + "{:10.3f}".format(avg) + \
-                "</p> <p>Frame-to-frame maximum magnitude of difference: " + "{:10.3f}".format(max) + \
-                "</p>" + "<p>Frame-to-frame minimum magnitude of difference: " + "{:10.3f}".format(min) + "<br/> </p>"
+        text =  "<div style=\"padding-left:10px\">" + \
+                "<h3>Basic statistics</h3>" + \
+                "<p>Number of processed frames: " + str(data.timeStamps.size) + \
+                "<p>Median: " + "{:10.3f}".format(medianFramerate) + " fps (" + "{:10.3f}".format(medianFrameTime) +" ms)" + \
+                "<p>Mean: " + "{:10.3f}".format(meanFramerate) + " fps (" + "{:10.3f}".format(meanFrametime) + " ms)" + \
+                "<p>Standard deviation: " + "{:10.3f}".format(stdDevFramerate) + " fps (" + "{:10.3f}".format(stdDevFrameTime) + " ms)" + \
+                "<h3>Frame-to-frame statistics</h3>" + \
+                "<p>Average magnitude of difference: " + "{:10.3f}".format(avgDiffAmp) + " ms</p>" + \
+                "<p>Maximum magnitude of difference: " + "{:10.3f}".format(maxDiffAmp) + " ms</p>" + \
+                "<p>Minimum magnitude of difference: " + "{:10.3f}".format(minDiffAmp) + " ms<br/> </p>" + \
+                "</div>"
         div = Div(text=text, width=width)
         return div
 
@@ -116,4 +133,4 @@ div = GenerateTextStatistics(data, 1068)
 endTime = time.time()
 print ("Time: " + str(endTime - startTime))
 # Output and show
-show(column(div, histogram, lineDiagram))
+show(row(column(histogram, lineDiagram),div))
