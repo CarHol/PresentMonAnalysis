@@ -22,7 +22,8 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel):
         p.x_range.start = mu - 4*sigma
         p.width = width
         p.toolbar.logo = None
-        hist, edges = np.histogram(data, density=True, bins=min(2000, len(data)))
+        print("Data size: " + str(data.size))
+        hist, edges = np.histogram(data, density=True, bins=min(2000, data.size))
         p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
                fill_color="#34d5eb", line_color="#34d5eb")
 
@@ -44,7 +45,7 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel):
 def CreateTabbedHistogram(dataSet, width):
         # Create the charts
         #frequencyData = []
-        frequencyData = 1000. / np.array(dataSet.msBetweenPresents)
+        frequencyData = 1000. / dataSet.msBetweenPresents
         #for frame in dataSet.msBetweenPresents:
                 #frequencyData.append(1000 / frame)
 

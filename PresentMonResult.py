@@ -6,13 +6,13 @@ import numpy as np
 # Simple structure to hold result data
 class PresentMonResult:
 # Result lists
-    dropped = []                # Frame dropped flags
-    timeStamps = []             # Time stamps for all frames
-    msBetweenPresents = []
-    msBetweenDisplayChange = []
-    msInPresentApi = []
-    msUntilRenderComplete = []
-    msUntilDisplayed = []
+    dropped = np.array([])                  # Frame dropped flags
+    timeStamps = np.array([])               # Time stamps for all frames
+    msBetweenPresents = np.array([])
+    msBetweenDisplayChange = np.array([])
+    msInPresentApi = np.array([])
+    msUntilRenderComplete = np.array([])
+    msUntilDisplayed = np.array([])
 
     # Application,ProcessID,SwapChainAddress,Runtime,SyncInterval,PresentFlags,AllowsTearing,PresentMode,Dropped,TimeInSeconds,MsBetweenPresents,MsBetweenDisplayChange,MsInPresentAPI,MsUntilRenderComplete,MsUntilDisplayed
     def __init__(self, application, processId, swapChainAddress, runTime, syncInterval, presentFlags, allowsTearing,
@@ -27,14 +27,15 @@ class PresentMonResult:
         self.presentMode = presentMode
 
     # Add frame data to the lists
-    def addFrame(self, timeInSeconds, msBetweenPresents, msBetweenDisplayChange, msInPresentApi, msUntilRenderComplete,
+    def addFrame(self, timeInSeconds, dropped, msBetweenPresents, msBetweenDisplayChange, msInPresentApi, msUntilRenderComplete,
                  msUntilDisplayed):
-        self.timeStamps.append(timeInSeconds)
-        self.msBetweenPresents.append(msBetweenPresents)
-        self.msBetweenDisplayChange.append(msBetweenDisplayChange)
-        self.msInPresentApi.append(msInPresentApi)
-        self.msUntilRenderComplete.append(msUntilRenderComplete)
-        self.msUntilDisplayed.append(msUntilDisplayed)
+        self.timeStamps             = np.append(self.timeStamps, timeInSeconds)
+        self.dropped                = np.append(self.dropped, dropped)
+        self.msBetweenPresents      = np.append(self.msBetweenPresents, msBetweenPresents)
+        self.msBetweenDisplayChange = np.append(self.msBetweenDisplayChange, msBetweenDisplayChange)
+        self.msInPresentApi         = np.append(self.msInPresentApi, msInPresentApi)
+        self.msUntilRenderComplete  = np.append(self.msUntilRenderComplete, msUntilRenderComplete)
+        self.msUntilDisplayed       = np.append(self.msUntilDisplayed, msUntilDisplayed)
 
 
 # HELPER FUNCTIONS:
@@ -73,18 +74,35 @@ def LoadFromCsv(filepath):
         # Skip header
         file.readline()
 
+        # Declare lists
+        dropped = []
+        timeStamp = []
+        msBetweenPresents = []
+        msBetweenDisplayChange = []
+        msInPresentApi = []
+        msUntilRenderComplete = []
+        msUntilDisplayed = []
+
         # Iterate
         for line in file:
             columns = line.strip().split(',')
             # Ignore blank or incomplete lines
             if len(columns) == 15:
-                result.dropped.append(int(columns[8]) == 1)
-                result.timeStamps.append(float(columns[9]))
-                result.msBetweenPresents.append(float(columns[10]))
-                result.msBetweenDisplayChange.append(float(columns[11]))
-                result.msInPresentApi.append(float(columns[12]))
-                result.msUntilRenderComplete.append(float(columns[13]))
-                result.msUntilDisplayed.append(float(columns[14]))
+                dropped.append(int(columns[8]) == 1)
+                timeStamp.append(float(columns[9]))
+                msBetweenPresents.append(float(columns[10]))
+                msBetweenDisplayChange.append(float(columns[11]))
+                msInPresentApi.append(float(columns[12]))
+                msUntilRenderComplete.append(float(columns[13]))
+                msUntilDisplayed.append(float(columns[14]))
+
+        result.timeStamps               = np.array(timeStamp)
+        result.dropped                  = np.array(dropped)
+        result.msBetweenPresents        = np.array(msBetweenPresents)
+        result.msBetweenDisplayChange   = np.array(msBetweenDisplayChange)
+        result.msInPresentApi           = np.array(msInPresentApi)
+        result.msUntilRenderComplete    = np.array(msUntilRenderComplete)
+        result.msUntilDisplayed         = np.array(msUntilDisplayed)
 
     # Return populated object
     return result
