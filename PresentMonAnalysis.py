@@ -7,9 +7,9 @@ import time
 from PresentMonResult import PresentMonResult, LoadFromCsv
 
 # FUNCTIONS
-def CreateHistogram(data, width, histTitle, xLabel, yLabel):
+def CreateHistogram(data, width, histTitle, xLabel, yLabel, indicateMu=True):
         # Get data from result:
-
+        #indicateMu = True, indicateSigma=0
         # TODO: Add automatic fps conversion in PresentMonResult class
         # TODO: Add parallellization for large datasets
         mu = np.mean(data)
@@ -22,16 +22,15 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel):
         p.x_range.start = mu - 4*sigma
         p.width = width
         p.toolbar.logo = None
-        print("Data size: " + str(data.size))
         hist, edges = np.histogram(data, density=True, bins=min(2000, data.size))
         p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
                fill_color="#34d5eb", line_color="#34d5eb")
 
         # Add markers for mean, stdev
-        muLine = Span(location=mu, dimension='height', line_color='red', line_width=1)
-        #sigmaLinePos = Span(location=(mu + sigma), dimension='height', line_color='green', line_width=1)
-        #sigmaLineNeg = Span(location=(mu - sigma), dimension='height', line_color='green', line_width=1)
-        p.renderers.extend([muLine])
+        if indicateMu:
+            muLine = Span(location=mu, dimension='height', line_color='red', line_width=1)
+            p.renderers.extend([muLine])
+
 
         # Create descriptive label:
         dataDescription = "Mean: " + "{:10.3f}".format(mu) + ",   StdDev: " + "{:10.3f}".format(sigma)
@@ -44,13 +43,19 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel):
 
 def CreateTabbedHistogram(dataSet, width):
         # Create the charts
-        #frequencyData = []
         frequencyData = 1000. / dataSet.msBetweenPresents
-        #for frame in dataSet.msBetweenPresents:
-                #frequencyData.append(1000 / frame)
 
-        timeHistogram = CreateHistogram(dataSet.msBetweenPresents, width, histTitle="Frametimes", xLabel="Frame time (ms)", yLabel="Relative frequency")
-        frequencyHistogram = CreateHistogram(frequencyData, width, histTitle="Framerate", xLabel="Framerate (fps)", yLabel="Relative frequency")
+        timeHistogram = CreateHistogram(dataSet.msBetweenPresents,
+                                        width,
+                                        histTitle="Frametimes",
+                                        xLabel="Frame time (ms)",
+                                        yLabel="Relative frequency")
+
+        frequencyHistogram = CreateHistogram(frequencyData,
+                                             width,
+                                             histTitle="Framerate",
+                                             xLabel="Framerate (fps)",
+                                             yLabel="Relative frequency")
 
         # Create panels
         timeTab = Panel(child=timeHistogram, title="Frametimes")
@@ -87,7 +92,8 @@ def GenerateTextStatistics(data, width):
         avg = np.mean(diffs)
 
         # Generate graphic
-        text =  "<p>Frame-to-frame average magnitude of difference: " + "{:10.3f}".format(avg) + \
+        text =  "<p>Number of processed frames: " + str(data.timeStamps.size) + \
+                "<p>Frame-to-frame average magnitude of difference: " + "{:10.3f}".format(avg) + \
                 "</p> <p>Frame-to-frame maximum magnitude of difference: " + "{:10.3f}".format(max) + \
                 "</p>" + "<p>Frame-to-frame minimum magnitude of difference: " + "{:10.3f}".format(min) + "<br/> </p>"
         div = Div(text=text, width=width)
