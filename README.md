@@ -31,7 +31,6 @@ Example:
 - Text box with basic frame-to-frame statistics (maximum, minimum and average difference in rendering time between two successive frames)
 
 ## In progress
-- Argument parsing for file input
 - Multi-file support (appending time stamps)
 - In-chart switching between frame times (ms) and frequency (fps) for all relevant charts
 - Switching between frame data (for instance, between msBetweenPresents and msUntilDisplayed)
