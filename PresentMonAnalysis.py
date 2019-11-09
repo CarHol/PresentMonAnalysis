@@ -92,8 +92,13 @@ def CreateTabbedLineDiagram(dataSet, width):
     return Tabs(tabs=[timeTab, frequencyTab])
 
 def GenerateTextStatistics(data, width):
+        # Number of frames:
+        nFrames = data.timeStamps.size
+        totalTimeSeconds = data.timeStamps[-1]
+
         # Calulate average frame-to-frame difference magnitude
         diffs = []
+        fpsFrames = 1000. / data.msBetweenPresents
         frameIterator = iter(data.msBetweenPresents)
         prev = next(frameIterator)      # Get first frame time
         for frame in frameIterator:
@@ -113,18 +118,39 @@ def GenerateTextStatistics(data, width):
         medianFramerate = 1000. / medianFrameTime
         stdDevFramerate = 1000. / stdDevFrameTime
 
+        # Thresholds (time spent above x fps)
+        # (threshold fps, list of frames, fraction of total time spent)
+        thresholds = [(60, [], 0.0),
+                      (120, [], 0.0),
+                      (144, [], 0.0)]
+        for frame in data.msBetweenPresents:
+            for index in range (0,len(thresholds)):
+            #for threshold in thresholds:
+                if (1000. / frame) > thresholds[index][0]:
+                    thresholds[index][1].append(frame)
+
+                    thresholds[index] = (thresholds[index][0], thresholds[index][1], thresholds[index][2] + (frame / 1000)/totalTimeSeconds)
+
+        # Threshold statistics
+        # Sanity check:
+        fracSum = sum([frac[2] for frac in thresholds])
+        print("Total fractions: " + str(fracSum))
+
         # Generate graphic
         text =  "<div style=\"padding-left:10px\">" + \
                 "<h3>Basic statistics</h3>" + \
-                "<p>Number of processed frames: " + str(data.timeStamps.size) + \
+                "<p>Number of processed frames: " + str(nFrames) + \
                 "<p>Median: " + "{:10.3f}".format(medianFramerate) + " fps (" + "{:10.3f}".format(medianFrameTime) +" ms)" + \
                 "<p>Mean: " + "{:10.3f}".format(meanFramerate) + " fps (" + "{:10.3f}".format(meanFrametime) + " ms)" + \
                 "<p>Standard deviation: " + "{:10.3f}".format(stdDevFramerate) + " fps (" + "{:10.3f}".format(stdDevFrameTime) + " ms)" + \
                 "<h3>Frame-to-frame statistics</h3>" + \
                 "<p>Average magnitude of difference: " + "{:10.3f}".format(avgDiffAmp) + " ms</p>" + \
                 "<p>Maximum magnitude of difference: " + "{:10.3f}".format(maxDiffAmp) + " ms</p>" + \
-                "<p>Minimum magnitude of difference: " + "{:10.3f}".format(minDiffAmp) + " ms<br/> </p>" + \
-                "</div>"
+                "<p>Minimum magnitude of difference: " + "{:10.3f}".format(minDiffAmp) + " ms</p>"
+        text = text + "<h3>Framerate threshold statistics:</h3>"
+        for threshold in thresholds:
+            text = text + "<p>Fraction of time spent above " + str(threshold[0]) + " fps: " + "{:10.3f}".format(threshold[2]*100) + "%</p>"
+        text = text + "</div>"
         div = Div(text=text, width=width)
         return div
 
@@ -143,7 +169,14 @@ lineDiagram = CreateTabbedLineDiagram(data, 1068)
 #lineDiagram = CreateLineDiagram(data, 1068)
 div = GenerateTextStatistics(data, 1068)
 
+# Some additional info
+reportedRuntime = data.timeStamps[-1]
+calculatedRuntime = np.sum(data.msBetweenPresents) / 1000
+
+print(reportedRuntime)
+print(calculatedRuntime)
+
 endTime = time.time()
-print ("Time: " + str(endTime - startTime))
+print ("Script runtime: " + str(endTime - startTime))
 # Output and show
 show(row(column(histogram, lineDiagram),div))

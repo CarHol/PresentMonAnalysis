@@ -37,6 +37,28 @@ class PresentMonResult:
         self.msUntilRenderComplete  = np.append(self.msUntilRenderComplete, msUntilRenderComplete)
         self.msUntilDisplayed       = np.append(self.msUntilDisplayed, msUntilDisplayed)
 
+class ZippedPresentMonResult:
+    resultRows = []
+
+    def __init__(self, application, processId, swapChainAddress, runTime, syncInterval, presentFlags, allowsTearing,
+                 presentMode):
+        self.application = application
+        self.processId = processId
+        self.swapChainAddress = swapChainAddress
+        self.runTime = runTime
+        self.syncInterval = syncInterval
+        self.presentFlags = presentFlags
+        self.allowsTearing = allowsTearing
+        self.presentMode = presentMode
+
+    def addFrame(self, timeInSeconds, dropped, msBetweenPresents, msBetweenDisplayChange, msInPresentApi,
+                 msUntilRenderComplete,
+                 msUntilDisplayed):
+        self.resultRows.append((timeInSeconds, dropped, msBetweenPresents, msBetweenDisplayChange, msInPresentApi,
+                 msUntilRenderComplete,
+                 msUntilDisplayed))
+
+
 
 # HELPER FUNCTIONS:
 # Load CSV file
@@ -96,7 +118,13 @@ def LoadFromCsv(filepath):
                 msUntilRenderComplete.append(float(columns[13]))
                 msUntilDisplayed.append(float(columns[14]))
 
-        result.timeStamps               = np.array(timeStamp)
+        # Synchronize timestamps with first frame rendering
+        result.timeStamps               = np.array(timeStamp) - (timeStamp[0] - (max([msBetweenPresents[0],
+                                                                                     msBetweenDisplayChange[0],
+                                                                                     msInPresentApi[0],
+                                                                                     msUntilRenderComplete[0],
+                                                                                     msUntilDisplayed[0]]) / 1000))
+
         result.dropped                  = np.array(dropped)
         result.msBetweenPresents        = np.array(msBetweenPresents)
         result.msBetweenDisplayChange   = np.array(msBetweenDisplayChange)
