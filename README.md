@@ -28,14 +28,16 @@ Example:
 `Python PresentMonAnalysis -f ./TestData/csgo.csv`
 
 ## What works
-- Histogram view with fixed values (result file path is hard coded, currently to an included example file) representing the relative frequency of FPS values.
-- Tabbed switching between frame times and framerate for histogram
-- Frametimes plotted against time
+- Histogram view with fixed values representing the relative frequency of FPS values or frametimes.
+- Frametimes and FPS plotted against time
+- Tabbed switching between frame times and framerate
 - Text box with basic frame-to-frame statistics (maximum, minimum and average difference in rendering time between two successive frames)
+- Some basic styling (via dictionaries)
 
 ## In progress
 - Multi-file support (appending time stamps)
-- In-chart switching between frame times (ms) and frequency (fps) for all relevant charts
+- Hover tool for reading exact data points in interactive charts
+- Real CSS stylesheet
 - Switching between frame data (for instance, between msBetweenPresents and msUntilDisplayed)
 - More advanced statistics
     - Analysis by percentile
