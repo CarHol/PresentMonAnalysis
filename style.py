@@ -1,5 +1,5 @@
 headerStyle = {
-    'font-size': '160%',
+    'font-size': '100%',
     'color': 'black'
 }
 
