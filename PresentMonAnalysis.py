@@ -30,21 +30,15 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel, indicateMu=True):
     p.width = width
     p.toolbar.logo = None
     hist, edges = np.histogram(data, density=True, bins=min(2000, data.size))
+
     p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
-           fill_color="#34d5eb", line_color="#34d5eb")
+           fill_color=style.histogramStyle['fill_color'], line_color=style.histogramStyle['line_color'])
 
     # Add markers for mean, stdev
     if indicateMu:
         muLine = Span(location=mu, dimension='height', line_color='red', line_width=1)
         p.renderers.extend([muLine])
 
-    # Create descriptive label:
-    dataDescription = "Mean: " + "{:10.3f}".format(mu) + ",   StdDev: " + "{:10.3f}".format(sigma)
-    labels = Label(x=0, y=0, x_units='screen', y_units='screen', text=dataDescription, border_line_color='black',
-                   render_mode='css', background_fill_color='white')
-    p.add_layout(labels)
-
-    # Return
     return p
 
 
