@@ -132,9 +132,6 @@ def GenerateTextStatistics(data, width):
                     thresholds[index] = (thresholds[index][0], thresholds[index][1], thresholds[index][2] + (frame / 1000)/totalTimeSeconds)
 
         # Threshold statistics
-        # Sanity check:
-        fracSum = sum([frac[2] for frac in thresholds])
-        print("Total fractions: " + str(fracSum))
 
         # Generate graphic
         text =  "<div style=\"padding-left:10px\">" + \
@@ -172,9 +169,6 @@ div = GenerateTextStatistics(data, 1068)
 # Some additional info
 reportedRuntime = data.timeStamps[-1]
 calculatedRuntime = np.sum(data.msBetweenPresents) / 1000
-
-print(reportedRuntime)
-print(calculatedRuntime)
 
 endTime = time.time()
 print ("Script runtime: " + str(endTime - startTime))
