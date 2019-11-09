@@ -1,6 +1,8 @@
 import argparse
 import numpy as np
 import time
+import ntpath
+import style
 from bokeh.plotting import figure, output_file, show
 from bokeh.models import Span, Label, Tabs, Panel
 from bokeh.models.widgets import Div
@@ -182,6 +184,8 @@ def GenerateThresholdStatistics(data, thresholdFramerates):
 
 
 # SETTINGS
+plotWidth = 1068
+
 # Parse arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("-debug", help="Enable debug mode", action="store_true")
@@ -204,14 +208,18 @@ data = LoadFromCsv(fileSource)
 # Set output file
 output_file("Analysis.html")
 
+# Generate header
+fileName = ntpath.basename(fileSource)
+header = Div(text="<div class=headerDiv><h1>Analysis: {}</h1></div>".format(fileName), width=plotWidth, style=style.headerStyle)
+
 # Generate plots
-histogram = CreateTabbedHistogram(data, 1068)  # Relative frequency histograms
-lineDiagram = CreateTabbedLineDiagram(data, 1068)  # Framerate/frametimes as line diagram
-div = GenerateTextStatistics(data, 1068)  # Statistics in text form
+histogram = CreateTabbedHistogram(data, plotWidth)  # Relative frequency histograms
+lineDiagram = CreateTabbedLineDiagram(data, plotWidth)  # Framerate/frametimes as line diagram
+textStatistics = GenerateTextStatistics(data, plotWidth)  # Statistics in text form
 
 endTime = time.time()  # For debug diagnostics
 if debug:
     print("Script runtime: " + str(endTime - startTime))
 
 # Output and show
-show(row(column(histogram, lineDiagram), div))
+show(column(header, row(column(histogram, lineDiagram), textStatistics)))
