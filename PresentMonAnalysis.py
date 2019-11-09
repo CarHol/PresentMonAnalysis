@@ -1,10 +1,14 @@
+import argparse
+import numpy as np
+import time
 from bokeh.plotting import figure, output_file, show
 from bokeh.models import Span, Label, Tabs, Panel
 from bokeh.models.widgets import Div
 from bokeh.layouts import column, row, widgetbox
-import numpy as np
-import time
 from PresentMonResult import PresentMonResult, LoadFromCsv
+
+# Debug?
+debug = False
 
 # FUNCTIONS
 def CreateHistogram(data, width, histTitle, xLabel, yLabel, indicateMu=True):
@@ -152,25 +156,36 @@ def GenerateTextStatistics(data, width):
         return div
 
 # SETTINGS
-# Hard coded source for now
+# Parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("-debug", help="Enable debug mode", action="store_true")
+parser.add_argument("-file", help="Path to a PresentMon generated CSV-file")
 
 startTime = time.time()
-data = LoadFromCsv("TestData/r5apex-0.csv")
+
+args = parser.parse_args()
+fileSource = "TestData/r5apex-0.csv"
+if args.file:
+    fileSource = args.file
+elif args.debug:
+    debug = True
+else:
+    parser.error('Either file or debug mode most be selected')
+
+# Load data
+data = LoadFromCsv(fileSource)
 
 # Set output file
 output_file("Analysis.html")
 
 # Generate plots
-histogram = CreateTabbedHistogram(data, 1068)
-lineDiagram = CreateTabbedLineDiagram(data, 1068)
-#lineDiagram = CreateLineDiagram(data, 1068)
-div = GenerateTextStatistics(data, 1068)
+histogram = CreateTabbedHistogram(data, 1068)               # Relative frequency histograms
+lineDiagram = CreateTabbedLineDiagram(data, 1068)           # Framerate/frametimes as line diagram
+div = GenerateTextStatistics(data, 1068)                    # Statistics in text form
 
-# Some additional info
-reportedRuntime = data.timeStamps[-1]
-calculatedRuntime = np.sum(data.msBetweenPresents) / 1000
+endTime = time.time()                                       # For debug diagnostics
+if debug:
+    print ("Script runtime: " + str(endTime - startTime))
 
-endTime = time.time()
-print ("Script runtime: " + str(endTime - startTime))
 # Output and show
 show(row(column(histogram, lineDiagram),div))

@@ -12,6 +12,18 @@ _Example output of a framerate distribution, representing the proportion of fram
 ## Output format
 This tool uses Bokeh to generate interactive charts in HTML and JS.
 
+## Usage
+`Python PresentMonAnalysis [-f PATH] [-debug]`
+
+Use the `-f PATH` argument to manually supply a CSV file (single file for now).
+Use the `-debug` argument to print debug info during runtime (such as total script time).
+You can use either `-f PATH`, `-debug` or both.
+
+Using `-debug` without specifying `-f PATH` will make use of a supplied example file. Using them in conjuction will print debug info for the manually selected file. Using no argument at all will print an error.
+
+Example:
+`Python PresentMonAnalysis -f ./TestData/csgo.csv`
+
 ## What works
 - Histogram view with fixed values (result file path is hard coded, currently to an included example file) representing the relative frequency of FPS values.
 - Tabbed switching between frame times and framerate for histogram
