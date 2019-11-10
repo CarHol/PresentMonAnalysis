@@ -3,6 +3,7 @@ import numpy as np
 import time
 import ntpath
 import style
+import ArrayUtils
 from bokeh.plotting import figure, output_file, show
 from bokeh.models import Span, Label, Tabs, Panel
 from bokeh.models.widgets import Div
@@ -44,9 +45,9 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel, indicateMu=True):
 
 def CreateTabbedHistogram(dataSet, width):
     # Create the charts
-    frequencyData = 1000. / dataSet.msBetweenPresents
+    frequencyData = 1000. /  np.array(dataSet)
 
-    timeHistogram = CreateHistogram(dataSet.msBetweenPresents,
+    timeHistogram = CreateHistogram(dataSet,
                                     width,
                                     histTitle="Frametimes",
                                     xLabel="Frame time (ms)",
@@ -64,7 +65,6 @@ def CreateTabbedHistogram(dataSet, width):
 
     # Create tabs
     return Tabs(tabs=[timeTab, frequencyTab])
-
 
 def CreateLineDiagram(frameData, timeData, width, chartTitle, xLabel, yLabel):
     p = figure(title=chartTitle, x_axis_label=xLabel, y_axis_label=yLabel)
@@ -132,16 +132,12 @@ def GenerateBasicStatisticsText(data):
 
 def GenerateFrameToFrameStatistics(data):
     # Calulate average frame-to-frame difference magnitude
-    diffs = []
-    fpsFrames = 1000. / data.msBetweenPresents
-    frameIterator = iter(data.msBetweenPresents)
-    prev = next(frameIterator)  # Get first frame time
-    for frame in frameIterator:
-        diffs.append(abs(frame - prev))
-        prev = frame
-    maxDiffAmp = np.max(diffs)
-    minDiffAmp = np.min(diffs)
-    avgDiffAmp = np.mean(diffs)
+    diffsMs = ArrayUtils.getArrDiffs(data.msBetweenPresents)
+    fpsFrames = 1000. / diffsMs
+
+    maxDiffAmp = np.max(diffsMs)
+    minDiffAmp = np.min(diffsMs)
+    avgDiffAmp = np.mean(diffsMs)
 
     # Generate and return text
     return "<h3>Frame-to-frame statistics</h3>" + \
@@ -207,7 +203,12 @@ fileName = ntpath.basename(fileSource)
 header = Div(text="<div class=headerDiv><h1>Analysis: {}</h1></div>".format(fileName), width=plotWidth, style=style.headerStyle)
 
 # Generate plots
-histogram = CreateTabbedHistogram(data, plotWidth)  # Relative frequency histograms
+histogram = CreateTabbedHistogram(data.msBetweenPresents, plotWidth)  # Relative frequency histograms
+frameToFrameHistogram =  CreateHistogram(ArrayUtils.getArrDiffs(data.msBetweenPresents),
+                                    plotWidth,
+                                    histTitle="Frame-to-frame deviations",
+                                    xLabel="Frame time difference (ms)",
+                                    yLabel="Relative frequency")
 lineDiagram = CreateTabbedLineDiagram(data, plotWidth)  # Framerate/frametimes as line diagram
 textStatistics = GenerateTextStatistics(data, plotWidth)  # Statistics in text form
 
@@ -216,4 +217,19 @@ if debug:
     print("Script runtime: " + str(endTime - startTime))
 
 # Output and show
-show(column(header, row(column(histogram, lineDiagram), textStatistics)))
+show(
+    column(
+        header,
+        row(
+            column(
+                Div(text="<div><h3>Performance distribution</h3></div>", width=plotWidth, style=style.subheaderStyle),
+                histogram,
+                Div(text="<div><h3>Performance timeline</h3></div>", width=plotWidth, style=style.subheaderStyle),
+                lineDiagram,
+                Div(text="<div><h3>Frame-to-frame deviations</h3></div>", width=plotWidth, style=style.subheaderStyle),
+                frameToFrameHistogram
+            ),
+            textStatistics
+        )
+    )
+)

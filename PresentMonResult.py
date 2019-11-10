@@ -134,3 +134,4 @@ def LoadFromCsv(filepath):
 
     # Return populated object
     return result
+
