@@ -16,6 +16,16 @@ debug = False
 
 # FUNCTIONS
 def CreateHistogram(data, width, histTitle, xLabel, yLabel, indicateMu=True):
+    """
+    Generates a Bokeh histogram from a numpy array of data.
+    :param data: Any numpy array of ints or floats
+    :param width: Target rendering width
+    :param histTitle: Chart title
+    :param xLabel: X-axis label
+    :param yLabel: Y-axis label
+    :param indicateMu: Whether or not to draw a vertical line indicating the data mean
+    :return: A Bokeh quad-graph with range from mu +/- (4*sigma).
+    """
     # Get data from result:
     # indicateMu = True, indicateSigma=0
     # TODO: Add automatic fps conversion in PresentMonResult class
@@ -44,6 +54,12 @@ def CreateHistogram(data, width, histTitle, xLabel, yLabel, indicateMu=True):
 
 
 def CreateTabbedHistogram(dataSet, width):
+    """
+    Creates a panel containing two histograms, one with frametimes and one with framerate
+    :param dataSet: A numpy array of frametimes in ms
+    :param width: Target rendering width
+    :return: A Bokeh panel with one tab for each histogram
+    """
     # Create the charts
     frequencyData = 1000. /  np.array(dataSet)
 
@@ -67,6 +83,18 @@ def CreateTabbedHistogram(dataSet, width):
     return Tabs(tabs=[timeTab, frequencyTab])
 
 def CreateLineDiagram(frameData, timeData, width, chartTitle, xLabel, yLabel):
+    """
+    Creates a line diagram over time from a numpy array
+    :param frameData: A numpy array containing framerate or frametimes
+    :param timeData: A numpy array containing timestamps
+    :param width: Target rendering width
+    :param chartTitle: The title of the chart
+    :param xLabel: X-axis label
+    :param yLabel: Y-axis label
+    :return: A Bokeh line diagram with frameData plotted against timeData
+    """
+
+    # Generate figure
     p = figure(title=chartTitle, x_axis_label=xLabel, y_axis_label=yLabel)
     p.width = width
     p.toolbar.logo = None
@@ -78,6 +106,12 @@ def CreateLineDiagram(frameData, timeData, width, chartTitle, xLabel, yLabel):
 
 
 def CreateTabbedLineDiagram(dataSet, width):
+    """
+    Generates a panel with two tabs, one for framerate and one for frametimes
+    :param dataSet: A PresentMonResult object
+    :param width: Target rendering width of the panel
+    :return: A Bokeh panel containing two tabs
+    """
     # Create charts
     frequencyData = 1000. / dataSet.msBetweenPresents
 
@@ -94,6 +128,12 @@ def CreateTabbedLineDiagram(dataSet, width):
 
 
 def GenerateTextStatistics(data, width):
+    """
+    Generates a Bokeh Div containing statistics in text form.
+    :param data: A numpy array of frametimes in ms.
+    :param width: Target rendering width.
+    :return: A Bokeh Div based on the input data.
+    """
     # Get components:
     basicStatistics = GenerateBasicStatisticsText(data)
     frameToFrameStatistics = GenerateFrameToFrameStatistics(data)
@@ -109,6 +149,11 @@ def GenerateTextStatistics(data, width):
 
 # Text block generation:
 def GenerateBasicStatisticsText(data):
+    """
+    Generates a basic statistics section in HTML format.
+    :param data: A PresentMonResult object.
+    :return: Basic statistics as an HTML string (header + paragraphs).
+    """
     nFrames = data.timeStamps.size
 
     # Mean, meadian and standard deviation times
@@ -131,6 +176,11 @@ def GenerateBasicStatisticsText(data):
 
 
 def GenerateFrameToFrameStatistics(data):
+    """
+    Generates frame-to-frame statistics in HTML format.
+    :param data: A PresentMonResult object.
+    :return: Frame-to-frame statistics as an HTML string (header + paragraphs).
+    """
     # Calulate average frame-to-frame difference magnitude
     diffsMs = ArrayUtils.getArrDiffs(data.msBetweenPresents)
 
@@ -146,6 +196,12 @@ def GenerateFrameToFrameStatistics(data):
 
 
 def GenerateThresholdStatistics(data, thresholdFramerates):
+    """
+    Generates threshold statistics in HTML data.
+    :param data: A PresentMonResult object.
+    :param thresholdFramerates: A list of framerates to use as thresholds.
+    :return: Threshold statistics as an HTML string (header + paragraphs).
+    """
     totalTimeSeconds = data.timeStamps[-1]
 
     thresholds = []
