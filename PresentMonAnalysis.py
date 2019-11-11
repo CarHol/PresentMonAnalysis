@@ -133,7 +133,6 @@ def GenerateBasicStatisticsText(data):
 def GenerateFrameToFrameStatistics(data):
     # Calulate average frame-to-frame difference magnitude
     diffsMs = ArrayUtils.getArrDiffs(data.msBetweenPresents)
-    fpsFrames = 1000. / diffsMs
 
     maxDiffAmp = np.max(diffsMs)
     minDiffAmp = np.min(diffsMs)
